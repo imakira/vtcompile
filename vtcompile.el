@@ -222,13 +222,13 @@ BUFFER is the compilation buffer."
 
 (defun vtcompile--end-of-vterm-buffer ()
   "Use a potentially unreliable method to move to the next line of
- the end of vterm prompt
+the end of vterm buffer
 
 If you just use `end-of-buffer' function,
- it will move to some blank area below last prompt.
+ it will move to some blank area below the last prompt.
 This idea is taken from `evil-collection-vterm-next-line'"
 
-  ;; Don't know exactly how `vterm-reset-cursor-point' works
+  ;; don't know exactly how `vterm-reset-cursor-point' works
   ;; but it moves the cursor close to the end
   (vterm-reset-cursor-point)
   ;; however we better not use `count-words' like in `evil-collection-vterm-next-line'
@@ -288,7 +288,7 @@ This idea is taken from `evil-collection-vterm-next-line'"
 BUFFER is the compilation buffer."
 
   ;; Sometimes buffer could be nil.
-  ;; I don't know why and have no choice other than ignore it.
+  ;; I don't know why and have no choice but to ignore it.
   (when buffer
     (with-current-buffer buffer
       (when vtcompile-compilation-mode
@@ -391,8 +391,7 @@ as the rest arguments"
   (define-key vtcompile-mode-map [remap counsel-compile] #'vtcompile-counsel-compile))
 
 (with-eval-after-load 'doom
-  ;; As doom emacs disables mode line in vterm buffers
-  ;; We re-enable it
+  ;; As doom emacs disables mode line in vterm buffers, we re-enable it
   (add-hook 'vtcompile-compilation-mode-hook
             (lambda ()
               (hide-mode-line-mode -1))))
