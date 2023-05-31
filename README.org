@@ -1,0 +1,36 @@
+#+title: vtcompile.el - Running Compilations in Vterm
+#+author: imakira
+#+language: en
+
+#+html: <a href="https://www.gnu.org/software/emacs/"><img alt="GNU Emacs" src="https://github.com/minad/corfu/blob/screenshots/emacs.svg?raw=true"/></a>
+
+Vtcompile is a little package makes running compilation commands in vterm more convenient.
+
+* Screenshots
+
+[[https://github.com/imakira/vtcompile/blob/screenshot/show-case-vtcompile.gif?raw=true]]
+Fig. 1: Command =vtcompile=
+
+[[https://github.com/imakira/vtcompile/blob/screenshot/show-case-counsel-integration.gif?raw=true]]
+Fig. 2: Command =vtcompile-counsel-compile=, integrating with counsel
+
+[[https://github.com/imakira/vtcompile/blob/screenshot/show-case-jump-to-error-location.gif?raw=true]]
+Fig. 3: Command =compile-goto-error=, leveraging builtin =compilation-shell-minor-mode=
+
+* Commands
+
++ =vtcompile-mode=: When this minor mode is enabled, it will remap several shortcuts with vtcompile counterparts.
+
++ =vtcompile=: Like the builtin =compile= command, but compiles in vterm
++ =vtcompile-recompile=: Restart the last compilation task.
+
+The following functions are just original functions with =compile= replaced with =vtcompile=.
+
++ If =projectile= is used
+  - =vtcompile-projectile-compile-project=
+
++ If =project= is used
+  - =vtcompile-project-compile=
+
++ If =counsel= is used
+  - =vtcompile-counse-compile=
