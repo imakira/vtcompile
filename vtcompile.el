@@ -162,17 +162,17 @@ as a buffer local variable"
 
   (let ((compilation-buffer (vtcompile--get-compilation-buffer-create command name-function))
         (thisdir default-directory)
+        ;; If the command finished too early, `vterm-kill-buffer-on-exit' set
+        ;; on `vtcompile-compilation-mode' as a local variable won't work.
+        ;; So the workaround is here.
         (vterm-kill-buffer-on-exit nil))
 
     (with-current-buffer compilation-buffer
-      ;; If the command finished too early, `vterm-kill-buffer-on-exit' set
-      ;; on `vtcompile-compilation-mode' as a local variable won't work.
-      ;; So the workaround is here.
       (setq-local compilation-directory thisdir)
       (setq-local vtcompile-running-command command)
       (run-hook-with-args 'vtcompile-pre-start-hook compilation-buffer)
 
-      ;; After this command, vterm mode will be enable
+      ;; After this command, vterm mode will be enabled
       ;; thus all local variable set previously will be destoryed.
       (vtcompile-vterm-run command)
 
@@ -251,9 +251,6 @@ This idea is taken from `evil-collection-vterm-next-line'"
                          'font-lock-face 'error)))
    " at " (substring (current-time-string) 0 19)))
 
-(defun vtcompile--disable-kill-buffer-on-exist (buffer _error)
-  (with-current-buffer buffer
-    (setq-local vterm-kill-buffer-on-exit nil)))
 
 (defun vtcompile--terminate-logging (buffer error-code)
   "Insert terminte info into the vterm buffer"
@@ -309,8 +306,6 @@ BUFFER is the compilation buffer."
 (add-hook 'vtcompile-pre-start-hook #'vtcompile--pre-start-logging)
 (add-hook 'vtcompile-terminated-hook #'vtcompile--terminate-logging)
 (add-hook 'vtcompile-terminated-hook #'vtcompile--terminate-modeline-update)
-(add-hook 'vtcompile-terminated-hook #'vtcompile--disable-kill-buffer-on-exist)
-
 
 (define-minor-mode vtcompile-compilation-mode
   "Minor mode for compilation buffer in vterm mode."
