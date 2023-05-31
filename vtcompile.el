@@ -112,7 +112,13 @@ thus the function can infer a suitable name according to it"
              (not (null (project-current)))
              ;; there's a `project-name' function
              ;; but it doesn't seem to be built in emacs 28
-             (file-name-nondirectory (directory-file-name (cdr (project-current)))))
+             (or (and (fboundp 'project-name) (project-name (project-current)))
+                 ;; return value of (project-current) is odd
+                 ;; it can be (vc . "dirname") (as a single cons cell)
+                 ;; or can be (vc GIT "dirname") (as a list)
+                 (file-name-nondirectory (directory-file-name (if (proper-list-p (project-current))
+                                                                  (car (last (project-current)))
+                                                                (cdr (project-current)))))))
         (file-name-base buffer-file-name))))
 
 (defun vtcompile--compilation-buffer-name (command)
@@ -161,11 +167,7 @@ HIGHLIGHT-REGEXP is set to `compilation-highlight-regexp'
 as a buffer local variable"
 
   (let ((compilation-buffer (vtcompile--get-compilation-buffer-create command name-function))
-        (thisdir default-directory)
-        ;; If the command finished too early, `vterm-kill-buffer-on-exit' set
-        ;; on `vtcompile-compilation-mode' as a local variable won't work.
-        ;; So the workaround is here.
-        (vterm-kill-buffer-on-exit nil))
+        (thisdir default-directory))
 
     (with-current-buffer compilation-buffer
       (setq-local compilation-directory thisdir)
@@ -313,7 +315,6 @@ BUFFER is the compilation buffer."
   :keymap (make-sparse-keymap)
   :global nil
   (setq-local vtcompile-running-process (get-buffer-process (current-buffer)))
-  (setq-local vterm-kill-buffer-on-exit nil)
   
   ;; `compilation-minor-mode' just works in most cases
   ;; although vterm will insert "fake newlines",
@@ -323,7 +324,21 @@ BUFFER is the compilation buffer."
   (compilation-shell-minor-mode)
   (setq mode-line-process
         '((:propertize ":%s" face compilation-mode-line-run)
-          compilation-mode-line-errors)))
+          compilation-mode-line-errors))
+  (setq-local vterm-kill-buffer-on-exit nil)
+
+  ;; make vterm--sentinel respect buffer local variables
+  ;; only in vtcompile-compilation-mode
+  ;; to retain the default behavior as much as possible
+  (advice-add 'vterm--sentinel
+              :around
+              (lambda (oldfun &rest args)
+                (if (with-current-buffer (process-buffer (car args))
+                      vtcompile-compilation-mode)
+                    (with-current-buffer (process-buffer (car args))
+                      (apply oldfun args))
+                  (apply oldfun args)))))
+
 
 (add-hook 'vterm-exit-functions #'vtcompile--run-terminated-hooks)
 
