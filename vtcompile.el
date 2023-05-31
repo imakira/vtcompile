@@ -46,8 +46,6 @@ The hooks take BUFFER and ERROR_CODE as parameters.")
 (defvar-local vtcompile-running-process nil
   "Compilation process running in current buffer.")
 
-(defvar vtcompile--save-vterm-kill-bufer-on-exit nil)
-
 (define-minor-mode vtcompile-mode
   "Minor mode to replace some common shortcuts with vtcompile equivalents.
 
@@ -162,14 +160,13 @@ HIGHLIGHT-REGEXP is set to `compilation-highlight-regexp'
 as a buffer local variable"
 
   (let ((compilation-buffer (vtcompile--get-compilation-buffer-create command name-function))
-        (thisdir default-directory))
+        (thisdir default-directory)
+        (vterm-kill-buffer-on-exit nil))
 
     (with-current-buffer compilation-buffer
       ;; If the command finished too early, `vterm-kill-buffer-on-exit' set
       ;; on `vtcompile-compilation-mode' as a local variable won't work.
       ;; So the workaround is here.
-      (setq vtcompile--save-vterm-kill-bufer-on-exit vterm-kill-buffer-on-exit)
-      (setq vterm-kill-buffer-on-exit nil)
       (setq-local compilation-directory thisdir)
       (setq-local vtcompile-running-command command)
       (run-hook-with-args 'vtcompile-pre-start-hook compilation-buffer)
@@ -182,7 +179,6 @@ as a buffer local variable"
       (if highlight-regexp
           (setq-local compilation-highlight-regexp highlight-regexp))
       (run-hook-with-args 'vtcompile-post-start-hook compilation-buffer)
-      (setq vterm-kill-buffer-on-exit vtcompile--save-vterm-kill-bufer-on-exit)
       compilation-buffer)))
 
 (defun vtcompile-vterm-run (command)

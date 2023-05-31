@@ -11,8 +11,10 @@ Vtcompile is a little package makes running compilation commands in vterm more c
 [[https://github.com/imakira/vtcompile/blob/screenshot/show-case-vtcompile.gif?raw=true]]
 Fig. 1: Command =vtcompile=
 
+
 [[https://github.com/imakira/vtcompile/blob/screenshot/show-case-counsel-integration.gif?raw=true]]
 Fig. 2: Command =vtcompile-counsel-compile=, integrating with counsel
+
 
 [[https://github.com/imakira/vtcompile/blob/screenshot/show-case-jump-to-error-location.gif?raw=true]]
 Fig. 3: Command =compile-goto-error=, leveraging builtin =compilation-shell-minor-mode=
